@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "postcss ./input.css -o ./public/output.css --minify",
+    "build": "postcss ./input.css -o ./public/output.css",
     "dev": "postcss ./input.css -o ./public/output.css --watch",
     "start": "node app.js"
   },
