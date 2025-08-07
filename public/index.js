@@ -73,7 +73,7 @@ function api(number, scnm) {
     try {
       // 2. 'timetableData'라는 키로 로컬 스토리지에 저장
       localStorage.setItem('schoolnumber', number);
-      localStorage.setItem('schoolname', scnm);
+      localStorage.setItem('scnm', scnm);
       
       console.log('시간표 데이터가 로컬 스토리지에 성공적으로 저장되었습니다.');
       window.location.href = '/school'

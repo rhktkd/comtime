@@ -119,6 +119,13 @@ document.addEventListener('DOMContentLoaded', function() {
     api();
 });
 
+function school_change() {
+    localStorage.removeItem('scnm');
+    localStorage.removeItem('schoolnumber');
+    window.location.href = '/'
+}
+
+
 function 자료944(자료,학년,반) {
     var p,k,th,분리,sb,속성='',
         원자료,일일자료,강의실='';
