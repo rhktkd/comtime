@@ -46,7 +46,7 @@ function api(api) {
     storage.ba = localStorage.getItem('ba') || "1-1"; // 'ba'가 없다면 기본값 "1-1"
     storage.scnm = localStorage.getItem('schoolname') || "";
     // 서버에서 시간표 데이터 가져오기
-    fetch(`http://rhk.kro.kr/api/school/${storage.sc}`)
+    fetch(`https://port-0-comtime-me10tmyt8817a068.sel5.cloudtype.app/api/school/${storage.sc}`)
     .then((response) => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
