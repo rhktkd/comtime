@@ -1,127 +1,174 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>시간표</title>
-    <!-- Tailwind CSS CDN을 사용하여 모바일 친화적이고 반응형인 디자인을 적용합니다. -->
+    <title>학교 시간표</title>
+
+    <!-- Tailwind CSS CDN을 사용하여 별도 설치 없이 스타일 적용 -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- school.js에서 jQuery를 사용하므로, jQuery 라이브러리를 추가합니다. -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawR8zF0Wp459eP55sB6wA6P6B6wA6P6wA6P6" crossorigin="anonymous"></script>
+
+    <!-- jQuery CDN -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
     <style>
-        /* Inter 폰트를 사용하여 가독성을 높입니다. */
+        /* 사용자 지정 클래스를 위한 기본 스타일 */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f7f9fc;
         }
-
-        /* 테이블 스타일 및 컴시간 JS에서 사용하는 클래스들을 CSS로 정의합니다. */
-        .timetable-table {
-            width: 100%;
-            table-layout: fixed;
+        .내용2, .교시, .제목, .내용, .변경, .내용3, .검색 {
+            border: 1px solid #e5e7eb; /* gray-200 */
         }
-
-        .timetable-table td, .timetable-table th {
-            border: 1px solid #e2e8f0;
-            padding: 8px;
+        /* 시간표 셀의 패딩과 글씨 크기를 줄여 전체적으로 작게 만듭니다. */
+        .내용2 {
             text-align: center;
-            font-size: 0.75rem; /* 모바일에서 글자가 잘 보이도록 크기를 조정합니다. */
-        }
-        
-        /* 모바일 화면에서 테이블이 삐져나가지 않도록 가로 스크롤을 허용합니다. */
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        /* school.js에 정의된 클래스들에 대한 스타일링 */
-        .내용, .변경, .내용2, .내용3, .내용4 {
-            border-width: 1px;
-            border-color: #e2e8f0;
+            font-weight: bold;
             padding: 4px;
         }
-
-        .내용, .내용2, .내용3, .내용4 {
-            background-color: #ffffff;
-        }
-
-        .변경 {
-            background-color: #fffbeb;
-            color: #d97706;
-            font-weight: bold;
-        }
-
         .교시 {
-            background-color: #e2e8f0;
+            background-color: #f3f4f6; /* gray-100 */
             font-weight: bold;
+            text-align: center;
+            padding: 4px;
         }
-        
         .제목 {
-            background-color: #bfdbfe;
+            background-color: #f3f4f6; /* gray-100 */
             font-weight: bold;
+            text-align: center;
+            padding: 4px;
+        }
+        .내용 {
+            text-align: center;
+            padding: 4px;
+        }
+        .변경 {
+            background-color: #fef3c7; /* yellow-100, 변경된 내용 강조 */
+            text-align: center;
+            padding: 4px;
+        }
+        .내용3 { /* 학년 시간표에서 특정 셀에 사용 */
+            text-align: center;
+            padding: 4px;
+            background-color: #dbeafe; /* blue-100, 약간 다른 배경색 */
+        }
+        .검색 {
+            text-align: center;
+            padding: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        td {
+            vertical-align: middle;
+            font-size: 0.8rem; /* text-sm 보다 조금 더 작게 */
+        }
+        /* 버튼, 셀렉트 박스, 입력 필드에 Tailwind 스타일 적용 */
+        select, input[type="button"], input[type="text"] {
+            padding: 6px 12px;
+            border-radius: 0.375rem; /* rounded-md */
+            border: 1px solid #d1d5db; /* gray-300 */
+            background-color: #ffffff;
+            font-size: 0.875rem; /* text-sm */
+            line-height: 1.25rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: all 0.15s ease-in-out;
+        }
+        input[type="button"]:hover {
+            background-color: #f9fafb; /* gray-50 */
+        }
+        input[type="button"]:active {
+            background-color: #e5e7eb; /* gray-200 */
+        }
+
+        /* 모바일 최적화를 위한 Tailwind 클래스 재정의 */
+        @media (max-width: 640px) {
+            td {
+                font-size: 0.65rem; /* text-xs 보다 더 작게 */
+                padding: 2px;
+            }
+            .내용2, .교시, .제목, .내용, .변경, .내용3, .검색 {
+                padding: 2px;
+            }
+            /* 학년 전체 시간표를 위한 스타일 수정 */
+            #hour2 table {
+                table-layout: fixed; /* 테이블 셀 너비를 고정 */
+            }
+            #hour2 td {
+                word-break: break-all; /* 셀 너비에 맞춰 글씨 줄바꿈 */
+                overflow-wrap: break-word; /* 긴 단어도 줄바꿈 */
+                font-size: 0.6rem; /* 글씨 크기를 더 작게 */
+                line-height: 1.2;
+            }
         }
     </style>
 </head>
-<body class="p-4 bg-gray-100">
+<body class="bg-white p-4 sm:p-8 flex items-center justify-center min-h-screen">
 
-    <!-- 메인 컨테이너: 중앙 정렬 및 여백을 설정하여 모바일과 데스크톱 모두 보기 좋게 만듭니다. -->
-    <div class="container mx-auto p-4 md:p-8 bg-white rounded-xl shadow-lg">
-        
-        <!-- 헤더 섹션: 학교명과 수정일을 표시합니다. -->
-        <header class="flex flex-col items-center justify-between mb-6">
-            <h1 id="scnm" class="text-3xl font-bold text-gray-800 text-center mb-2">시간표</h1>
-            <span id="수정일" class="text-sm text-gray-500"></span>
-        </header>
+    <div id="app-container" class="bg-white p-4 sm:p-8 rounded-lg shadow-xl w-full max-w-5xl">
 
-        <!-- 시간표 열람 섹션: 학교가 선택된 후 표시됩니다. (초기에는 숨겨짐) -->
-        <div id="시간표열람" class="hidden">
-            <!-- 날짜 및 학급 선택 드롭다운 -->
-            <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
-                <div class="flex items-center space-x-2">
-                    <label for="nal" class="font-medium text-gray-700">날짜:</label>
-                    <select id="nal" name="nal" onchange="nal_change()" class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"></select>
+        <!-- 시간표 열람 섹션 -->
+        <div id="시간표열람">
+            <h1 class="text-xl sm:text-2xl font-bold mb-4 text-center" id="scnm">학교명</h1>
+
+            <div class="flex flex-row flex-wrap items-center justify-center gap-2 mb-6">
+                <select id="ba" name="ba" onchange="ba_change()" class="p-2 border rounded-md">
+                    <!-- 학급 옵션이 JS에 의해 채워집니다 -->
+                </select>
+                <select id="nal" name="nal" onchange="nal_change()" class="p-2 border rounded-md">
+                    <!-- 일자 옵션이 JS에 의해 채워집니다 -->
+                </select>
+                <input type="button" onClick="new_change()" value="새로고침" class="bg-yellow-400 text-black hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50 font-bold">
+                <input type="button" onClick="window.location.href = '/'" value="학교 변경" class="bg-red-500 text-black hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 font-bold">
+            </div>
+
+            <div class="overflow-x-auto mb-6">
+                <!-- 개별 학급 시간표가 여기에 표시됩니다 -->
+                <div id="hour"></div>
+            </div>
+
+            <!-- '학년 전체 시간표'를 위한 통합 토글 바와 내용 섹션 -->
+            <div class="mt-4">
+                <div id="toggleBar" onclick="toggleGradeTimetable()" class="flex items-center justify-center cursor-pointer py-1 w-full bg-gray-200 hover:bg-gray-300 rounded-md">
+                    <!-- 접기/펴기 상태를 시각적으로 보여주는 화살표 아이콘 -->
+                    <svg id="toggleIcon" class="w-4 h-4 transform transition-transform" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
                 </div>
-
-                <div class="flex items-center space-x-2">
-                    <label for="ba" class="font-medium text-gray-700">학급:</label>
-                    <select id="ba" name="ba" onchange="ba_change()" class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"></select>
+                <!-- 학년 전체 시간표 섹션 - 평소에는 숨겨짐 -->
+                <div id="hour2" class="hidden overflow-x-auto mt-4 mb-6">
+                    <!-- 학년 전체 시간표가 여기에 표시됩니다 -->
                 </div>
             </div>
 
-            <!-- 개인 시간표가 표시되는 영역입니다. -->
-            <div id="hour" class="table-responsive w-full mb-6">
-                <!-- 자료944 함수가 여기에 테이블을 생성합니다. -->
-            </div>
-            
-            <!-- 학년 전체 시간표가 표시되는 영역입니다. -->
-            <div id="hour2" class="table-responsive w-full">
-                <!-- 학년시간표출력 함수가 여기에 테이블을 생성합니다. -->
+            <div class="text-xs sm:text-sm text-gray-500 text-right mb-4">
+                <span id="수정일"></span>
             </div>
 
-            <!-- 컴시간 전달사항 및 학교 전달사항 메시지가 표시되는 영역입니다. -->
-            <div id="mesg" class="mt-8 p-4 bg-gray-50 border border-gray-200 rounded-lg"></div>
-            <div id="mesg2" class="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg"></div>
+            <div id="mesg" class="mb-4 text-xs sm:text-sm"></div>
+            <div id="mesg2" class="mb-4 text-xs sm:text-sm"></div>
         </div>
-
-        <!-- 학교 찾기 섹션: 초기 화면 또는 학교가 선택되지 않았을 때 표시됩니다. (초기에는 숨겨짐) -->
-        <div id="학교찾기" class="hidden">
-            <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
-                <input type="text" id="sc" name="sc" placeholder="학교명 검색" class="w-full sm:w-auto p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <button onclick="sc2_search()" class="w-full sm:w-auto px-6 py-3 bg-blue-500 text-white font-bold rounded-md shadow hover:bg-blue-600 transition-colors duration-200">검색</button>
-            </div>
-            
-            <div class="table-responsive">
-                <table id="학교명단검색" class="w-full table-auto border-collapse">
-                    <!-- 학교명단_출력하기 함수가 여기에 테이블을 생성합니다. -->
-                </table>
-            </div>
-
-            <div id="mesg3" class="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm"></div>
-        </div>
-        
     </div>
-
-    <!-- 모든 HTML 요소가 로드된 후 school.js 스크립트를 로드합니다. -->
+    
+    <!-- school.js 파일 포함 -->
     <script src="school.js"></script>
 
+    <!-- 스크립트 추가: 학년 시간표 표시/숨기기 토글 기능 -->
+    <script>
+        function toggleGradeTimetable() {
+            const hour2 = document.getElementById('hour2');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (hour2.classList.contains('hidden')) {
+                hour2.classList.remove('hidden');
+                // 시간표가 보이면 아이콘을 위로 회전시킵니다.
+                toggleIcon.classList.add('rotate-180');
+            } else {
+                hour2.classList.add('hidden');
+                // 시간표가 숨겨지면 아이콘을 원래대로 돌립니다.
+                toggleIcon.classList.remove('rotate-180');
+            }
+        }
+    </script>
 </body>
 </html>
