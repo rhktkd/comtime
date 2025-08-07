@@ -1,7 +1,7 @@
 const express = require('express')
 const path = require('path');
 const app = express()
-const port = 80
+const port = 3000
 var iconv = require('iconv-lite');
 const fetch = require('node-fetch'); // node-fetch 라이브러리가 필요합니다.
 
