@@ -23,7 +23,8 @@ if (!loginForm) {
         const data = { school };
 
         // 4. 서버로 데이터 전송
-        fetch('https://port-0-comtime-me10tmyt8817a068.sel5.cloudtype.app/api/schoolnumber', {
+        //fetch('https://port-0-comtime-me10tmyt8817a068.sel5.cloudtype.app/api/schoolnumber', {
+        fetch('http://localhost:3000/api/schoolnumber', {
             method: 'POST', // HTTP 요청 메서드
             headers: {
                 'Content-Type': 'application/json' // 데이터 형식이 JSON임을 명시
