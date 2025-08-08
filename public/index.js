@@ -17,7 +17,7 @@ if (!loginForm) {
             return;
         }
 
-        const school = schoolInput.value;
+        const school = str = schoolInput.value.replace(/\s/g, "");;
         console.log('학교 검색:', school);
 
         const data = { school };
