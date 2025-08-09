@@ -59,7 +59,7 @@ async function fetchSchoolNameById(schoolId) {
 // api 함수 수정: 초기 로드 시 학교 이름 설정 로직 추가
 async function api() {
     // 로컬 스토리지에서 학교 번호 불러오기
-    let number = localStorage.getItem('schoolnumber'); // schoolnumber는 JSON이 아닌 일반 문자열일 수 있어 바로 가져옵니다.
+    let number = localStorage.getItem('sc'); // schoolnumber는 JSON이 아닌 일반 문자열일 수 있어 바로 가져옵니다.
     
     if (!number) {
         // schoolnumber가 없으면 timetableData도 확인
@@ -100,8 +100,8 @@ async function api() {
     }
     
     // 서버에서 시간표 데이터 가져오기
-    //fetch(`http://localhost:3000/api/school/${storage.sc}`)
-    fetch(`https://port-0-comtime-me10tmyt8817a068.sel5.cloudtype.app/api/school/${storage.sc}`)
+    fetch(`http://localhost:3000/api/school/${storage.sc}`)
+    //fetch(`https://port-0-comtime-me10tmyt8817a068.sel5.cloudtype.app/api/school/${storage.sc}`)
     .then((response) => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -122,7 +122,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function school_change() {
     localStorage.removeItem('scnm');
-    localStorage.removeItem('schoolnumber');
+    localStorage.removeItem('sc');
+    localStorage.removeItem('ba');
     window.location.href = '/'
 }
 
@@ -526,9 +527,11 @@ function ba_change(){
     storage.ba = ba_value;
     $('#hour').empty().append(자료944(H시간표,학년,반));
     학년출력하기(학년);
+
 }
 
 function 학년출력하기(학년){
+    localStorage.setItem('ba', storage.ba);
     let 요일;
     const d = new Date();
     요일 = d.getDay(); // 현재 요일 가져오기 (0:일, 1:월, ..., 6:토)
