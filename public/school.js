@@ -100,8 +100,8 @@ async function api() {
     }
     
     // 서버에서 시간표 데이터 가져오기
-    fetch(`http://localhost:3000/api/school/${storage.sc}`)
-    //fetch(`https://port-0-comtime-me10tmyt8817a068.sel5.cloudtype.app/api/school/${storage.sc}`)
+    //fetch(`http://localhost:3000/api/school/${storage.sc}`)
+    fetch(`https://port-0-comtime-me10tmyt8817a068.sel5.cloudtype.app/api/school/${storage.sc}`)
     .then((response) => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
