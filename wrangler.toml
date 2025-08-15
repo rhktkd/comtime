@@ -1,12 +1,12 @@
-[pages]
-# functions 디렉터리의 위치를 지정합니다.
-# 기본값은 "functions"이므로 생략 가능
-# [pages.functions]
-# dir = "functions"
-
-# nodejs 호환성 모드를 활성화합니다.
-[pages.functions.build]
-nodejs_compat = true
+name = "comtime-web-service"
+main = "src/index.ts"
+compatibility_date = "2024-04-03"
 
 [pages]
 compatibility_flags = ["nodejs_compat"]
+
+[pages.functions]
+dir = "functions"
+
+[pages.functions.build]
+nodejs_compat = true
