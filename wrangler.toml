@@ -1,9 +1,6 @@
 compatibility_date = "2025-08-15"
 compatibility_flags = ["nodejs_compat"]
 
-# 만약 프론트엔드도 함께 배포한다면 아래 설정을 추가합니다.
-bucket = "./public"
-
 # 워커 스크립트 파일의 경로
 main = "./app.js"
 
