@@ -1,4 +1,8 @@
 compatibility_date = "2025-08-15"
 
-[assets]
-directory = "./public"
+# 워커 스크립트 파일의 경로
+main = "./app.js"
+
+# 정적 파일(프론트엔드) 디렉터리 설정
+[site]
+bucket = "./public"
