@@ -1,5 +1,6 @@
+name = "comtime"
+main = "app.js"
 compatibility_date = "2025-08-15"
-compatibility_flags = ["nodejs_compat"] # Buffer 등의 Node.js 호환 기능을 위해 필요합니다.
 
 [site]
 bucket = "./public"
