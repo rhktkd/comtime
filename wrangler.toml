@@ -1,12 +1,1 @@
-name = "comtime-web-service"
-main = "src/index.ts"
-compatibility_date = "2024-04-03"
-
-[pages]
-compatibility_flags = ["nodejs_compat"]
-
-[pages.functions]
-dir = "functions"
-
-[pages.functions.build]
-nodejs_compat = true
+name = 'comtime'

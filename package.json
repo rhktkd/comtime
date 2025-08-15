@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "postcss ./input.css -o ./public/output.css",
-    "dev": "postcss ./input.css -o ./public/output.css",
-    "start": "node app.js"
+    "dev": "wrangler dev",
+    "start": "wrangler deploy"
   },
   "repository": {
     "type": "git",
