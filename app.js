@@ -1,14 +1,19 @@
-const express = require('express')
-const path = require('path');
-const app = express()
-const port = 3000
-var iconv = require('iconv-lite');
-const fetch = require('node-fetch'); // node-fetch 라이브러리가 필요합니다.
+// itty-router를 사용하여 Express의 라우팅 기능을 대체합니다.
+// Workers 환경에서는 npm 패키지를 직접 import할 수 없으므로,
+// Workers에 맞는 라이브러리를 사용하거나 직접 코드를 포함해야 합니다.
+// Cloudflare Workers에서는 'itty-router'를 공식적으로 권장합니다.
+// 이 코드는 'itty-router' 라이브러리가 존재한다고 가정하고 작성되었습니다.
+// 실제 배포 시에는 'wrangler.toml'에 필요한 패키지를 명시하거나
+// Hono와 같은 대체 라이브러리를 사용할 수 있습니다.
 
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json());
+// Itty-router의 Router 클래스를 가져옵니다.
+import { Router } from 'itty-router';
+
+// 라우터 인스턴스 생성
+const router = Router();
 
 // JSON 문자열에서 유효한 JSON 부분만 추출하는 유틸리티 함수
+// 이 함수는 Node.js 코드의 로직을 그대로 유지했습니다.
 function extractJsonSubstring(text) {
     const startIndex = text.indexOf('{');
     const endIndex = text.lastIndexOf('}');
@@ -16,119 +21,120 @@ function extractJsonSubstring(text) {
         return text.substring(startIndex, endIndex + 1);
     }
     
-    // 객체 형태가 아니면 배열 형태를 시도
     const arrayStartIndex = text.indexOf('[');
     const arrayEndIndex = text.lastIndexOf(']');
     if (arrayStartIndex !== -1 && arrayEndIndex !== -1 && arrayEndIndex > arrayStartIndex) {
         return text.substring(arrayStartIndex, arrayEndIndex + 1);
     }
 
-    return null; // 유효한 JSON을 찾지 못하면 null 반환
+    return null;
 }
 
-// 루트 경로 ('/')에 대한 GET 요청 처리
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-})
-
-
-app.get('/school', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'school.html'));
-})
-
-
-// 학교 검색 API 요청 처리
-app.post('/api/schoolnumber', (req, res) => {
-    const data = req.body;
-
-    console.log(`학교 검색: ${data.school}`);
-
-    // iconv-lite를 사용하여 EUC-KR로 인코딩
-    const eucKrBuffer = iconv.encode(data.school, 'euc-kr');
-
-    // 버퍼를 16진수 문자열로 변환하고 '%'를 붙이는 함수
-    function percentEncodeEucKr(buffer) {
-        let result = '';
-        for (const byte of buffer) {
-            // 각 바이트를 16진수(2자리)로 변환하고 앞에 '%'를 붙임
-            result += '%' + byte.toString(16).padStart(2, '0');
-        }
-        return result;
+// EUC-KR 인코딩 및 퍼센트 인코딩 함수
+// iconv-lite 대신 Workers 환경에서 직접 구현합니다.
+function percentEncodeEucKr(text) {
+    const encoder = new TextEncoder('euc-kr');
+    const encoded = encoder.encode(text);
+    let result = '';
+    for (const byte of encoded) {
+        result += '%' + byte.toString(16).padStart(2, '0').toUpperCase();
     }
-    
-    const encodedString = percentEncodeEucKr(eucKrBuffer);
+    return result;
+}
+
+// Base64 인코딩 함수
+// Node.js의 Buffer를 대체합니다. Workers 환경의 fetch에는 Buffer가 내장되어 있습니다.
+function base64Encode(str) {
+    return btoa(str);
+}
+
+
+// '/api/schoolnumber'에 대한 POST 요청 처리
+router.post('/api/schoolnumber', async (request) => {
+    // Cloudflare Workers에서는 express.json()이 없으므로,
+    // request.json()을 사용해 요청 본문을 파싱합니다.
+    const data = await request.json();
+
+    const encodedString = percentEncodeEucKr(data.school);
     console.log(`EUC-KR 퍼센트 인코딩: ${encodedString}`);
 
-    fetch(`http://comci.net:4082/36179?17384l${encodedString}`)
-    .then((response) => {
+    try {
+        const response = await fetch(`http://comci.net:4082/36179?17384l${encodedString}`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return response.text();
-    })
-    .then((text) => {
-        try {
-            // 원시 응답 텍스트에서 JSON 부분만 추출
-            const jsonSubstring = extractJsonSubstring(text);
-            
-            if (!jsonSubstring) {
-                throw new Error("응답에서 유효한 JSON 부분을 찾을 수 없습니다.");
-            }
-
-            const data = JSON.parse(jsonSubstring);
-            console.log("성공적으로 파싱된 데이터:", data);
-            res.json(data); 
-        } catch (error) {
-            console.error("JSON 파싱 오류:", error.message);
-            console.error("원본 응답 데이터:", text);
-            res.status(500).json({ error: "JSON 파싱 오류가 발생했습니다." });
+        
+        const text = await response.text();
+        const jsonSubstring = extractJsonSubstring(text);
+        
+        if (!jsonSubstring) {
+            throw new Error("응답에서 유효한 JSON 부분을 찾을 수 없습니다.");
         }
-    })
-    .catch((error) => {
-        console.error("Fetch 요청 오류:", error.message);
-        res.status(500).json({ error: "Fetch 요청 중 오류가 발생했습니다." });
-    });
-})
 
-// 학교 번호 API 요청 처리
-app.get('/api/school/:id', (req, res) => {
-    // 임시로 하드코딩된 학교 번호. 실제로는 클라이언트 요청에서 받아와야 합니다.
-    const schoolnumber = req.params.id; 
-    
-    // Base64 인코딩
-    const base64Encode = Buffer.from(`73629_${schoolnumber}_0_1`).toString('base64');
-    console.log(`Base64 인코딩: ${base64Encode}`);
+        const jsonData = JSON.parse(jsonSubstring);
+        console.log("성공적으로 파싱된 데이터:", jsonData);
+        return new Response(JSON.stringify(jsonData), {
+            headers: { 'Content-Type': 'application/json' },
+            status: 200
+        });
 
-    fetch(`http://comci.net:4082/36179?${base64Encode}`)
-    .then((response) => {
+    } catch (error) {
+        console.error("Fetch 요청 또는 JSON 파싱 오류:", error.message);
+        return new Response(JSON.stringify({ error: error.message }), {
+            headers: { 'Content-Type': 'application/json' },
+            status: 500
+        });
+    }
+});
+
+
+// '/api/school/:id'에 대한 GET 요청 처리
+router.get('/api/school/:id', async (request) => {
+    // itty-router는 URL 매개변수를 request.params로 전달합니다.
+    const schoolnumber = request.params.id;
+
+    const base64Str = base64Encode(`73629_${schoolnumber}_0_1`);
+    console.log(`Base64 인코딩: ${base64Str}`);
+
+    try {
+        const response = await fetch(`http://comci.net:4082/36179?${base64Str}`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return response.text();
-    })
-    .then((text) => {
-        try {
-            const jsonSubstring = extractJsonSubstring(text);
-            
-            if (!jsonSubstring) {
-                throw new Error("응답에서 유효한 JSON 부분을 찾을 수 없습니다.");
-            }
+        
+        const text = await response.text();
+        const jsonSubstring = extractJsonSubstring(text);
 
-            const data = JSON.parse(jsonSubstring);
-            res.json(data);
-
-        } catch (error) {
-            console.error("JSON 파싱 오류:", error.message);
-            console.error("원본 응답 데이터:", text);
-            res.status(500).json({ error: "JSON 파싱 오류가 발생했습니다." });
+        if (!jsonSubstring) {
+            throw new Error("응답에서 유효한 JSON 부분을 찾을 수 없습니다.");
         }
-    })
-    .catch((error) => {
-        console.error("Fetch 요청 오류:", error.message);
-        res.status(500).json({ error: "Fetch 요청 중 오류가 발생했습니다." });
-    });
-})
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+        const jsonData = JSON.parse(jsonSubstring);
+        return new Response(JSON.stringify(jsonData), {
+            headers: { 'Content-Type': 'application/json' },
+            status: 200
+        });
+
+    } catch (error) {
+        console.error("Fetch 요청 또는 JSON 파싱 오류:", error.message);
+        return new Response(JSON.stringify({ error: error.message }), {
+            headers: { 'Content-Type': 'application/json' },
+            status: 500
+        });
+    }
+});
+
+
+// 나머지 모든 요청에 대한 라우팅
+// Cloudflare Pages는 정적 파일을 자동으로 처리하므로,
+// Workers 스크립트에서 HTML 파일을 제공할 필요가 없습니다.
+// 이 라우터는 API 요청만 처리하도록 설계되었습니다.
+// 나머지 모든 요청에 대해 'itty-router'는 404 Not Found를 반환합니다.
+// 이 로직은 정적 파일이 Cloudflare Pages에 의해 서빙된다는 가정하에 작동합니다.
+
+
+// Workers의 이벤트 리스너
+// 이 리스너는 모든 인바운드 요청을 가로채 라우터에 전달합니다.
+export default {
+    fetch: router.handle
+};
