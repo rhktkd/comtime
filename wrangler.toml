@@ -1,1 +1,4 @@
 name = 'comtime'
+
+compatibility_date = "2025-08-15" [cite: 2]
+main = "app.js" [cite: 2]
