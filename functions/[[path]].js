@@ -1,5 +1,5 @@
 // app.js에 있는 express 앱을 불러옵니다.
-import app from '../../app.js'; 
+import app from '../app.js'; 
 
 // Express 미들웨어를 Cloudflare Functions에 맞게 변환하는 헬퍼 함수
 const toWebRequest = (request) => {
