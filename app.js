@@ -1,8 +1,5 @@
-// Itty-router를 사용하여 Express의 라우팅 기능을 대체합니다.
-// 이 코드는 'itty-router' 라이브러리가 존재한다고 가정하고 작성되었습니다.
-// 실제 배포 시에는 wrangler.toml에 itty-router를 dependencies로 추가하거나, 
-// esm.sh와 같은 CDN을 통해 import 해야 합니다.
-import { Router } from 'itty-router';
+// Cloudflare Workers 환경에서 itty-router를 CDN을 통해 import합니다.
+import { Router } from 'https://esm.sh/itty-router@4.0.12';
 
 // 라우터 인스턴스를 생성합니다.
 const router = Router();
