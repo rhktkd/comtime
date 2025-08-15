@@ -4,10 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "postcss ./input.css -o ./public/output.css",
-    "dev": "wrangler dev",
-    "start": "wrangler deploy"
+    "deploy": "wrangler deploy --minify"
   },
   "repository": {
     "type": "git",
