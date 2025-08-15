@@ -1,6 +1,0 @@
-name = "comtime"
-main = "app.js"
-compatibility_date = "2025-08-15"
-
-[site]
-bucket = "./public"
