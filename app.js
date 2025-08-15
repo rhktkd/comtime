@@ -1,4 +1,5 @@
 // Cloudflare Workers 환경에서 itty-router를 CDN을 통해 import합니다.
+// URL의 슬래시를 수정하여 경로를 올바르게 지정했습니다.
 import { Router } from 'https://esm.sh/itty-router@4.0.12';
 
 // 라우터 인스턴스를 생성합니다.
