@@ -7,3 +7,6 @@
 # nodejs 호환성 모드를 활성화합니다.
 [pages.functions.build]
 nodejs_compat = true
+
+[pages]
+compatibility_flags = ["nodejs_compat"]
