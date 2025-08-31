@@ -1,23 +1,16 @@
-// school.js
-
-// 1. 전역 변수 정의 (컴시간 JS 코드에서 사용)
 let H시간표 = {};
 let H학교명단 = {};
 let storage = {
     sc: null, // 학교 코드
     r: null,  // 날짜 코드
-    ba: "1-1", // 학년-반 (기본값)
-    hour: null, // 시간표 데이터 (JSON 문자열)
-    Tsc: '' // 임시 학교 코드
+    ba: "1-1", // 학년-반
+    hour: null, // 시간표 데이터
 };
 
-// `localStorage`에서 데이터를 불러오는 함수
 function loadTimetableData(localdata) {
     try {
         const jsonString = localStorage.getItem(localdata);
         if (jsonString) {
-            // school.js는 JSON 데이터를 사용하므로 JSON.parse를 사용
-            // 학교 이름은 직접 문자열로 가져와서 사용함
             const data = JSON.parse(jsonString);
             console.log('로컬 스토리지에서 데이터 불러오기 성공:', data);
             return data;
@@ -31,38 +24,31 @@ function loadTimetableData(localdata) {
     }
 }
 
-// 학교 이름을 ID로 가져오는 비동기 함수 추가
 async function fetchSchoolNameById(schoolId) {
     try {
-        // school_ra 함수가 사용하는 것과 동일한 엔드포인트 사용
         const response = await fetch(`./36179?17384l${schoolId}`); 
         const data2 = await response.text();
         const da = data2.substr(0, data2.lastIndexOf('}') + 1);
         const schoolData = JSON.parse(da);
 
         if (schoolData && schoolData.학교검색 && schoolData.학교검색.length > 0) {
-            // 반환된 목록에서 해당 학교 ID에 맞는 이름 찾기
             for (let i = 0; i < schoolData.학교검색.length; i++) {
                 if (schoolData.학교검색[i][3] == schoolId) {
                     return schoolData.학교검색[i][2];
                 }
             }
         }
-        return ''; // 학교를 찾지 못함
+        return '';
     } catch (error) {
         console.error('학교 이름을 불러오는 중 오류가 발생했습니다:', error);
         return '';
     }
 }
 
-
-// api 함수 수정: 초기 로드 시 학교 이름 설정 로직 추가
 async function api() {
-    // 로컬 스토리지에서 학교 번호 불러오기
-    let number = localStorage.getItem('sc'); // schoolnumber는 JSON이 아닌 일반 문자열일 수 있어 바로 가져옵니다.
+    let number = localStorage.getItem('sc');
     
     if (!number) {
-        // schoolnumber가 없으면 timetableData도 확인
         let timetableData = loadTimetableData('timetableData');
         if (timetableData && timetableData.sc) {
             number = timetableData.sc;
@@ -70,38 +56,29 @@ async function api() {
     }
 
     if (!number) {
-        // 학교 번호가 없으면 초기 페이지로 리다이렉트
-        // 학교 검색 기능을 제거했으므로, 이 상태에서는 로컬 스토리지에 값이 있어야 정상적으로 작동합니다.
         window.location.href = '/';
         return;
-    } else {
-        // 로컬 스토리지에 학교 번호가 있으면 시간표 열람 화면 표시
-        // HTML에서 검색 기능이 제거되었으므로 hidden 클래스도 제거했습니다.
     }
     
-    // 로컬 스토리지에 저장된 학교 코드와 날짜 코드 업데이트
     storage.sc = localStorage.getItem('sc') || number; 
     storage.r = localStorage.getItem('r') || 1; 
     storage.ba = localStorage.getItem('ba') || "1-1";
 
-    // 학교 이름이 로컬 스토리지에 없거나 비어있으면 서버에서 가져와 설정
     let storedScnm = localStorage.getItem('scnm');
     if (!storedScnm && storage.sc) {
         const fetchedScnm = await fetchSchoolNameById(storage.sc);
         if (fetchedScnm) {
             document.getElementById('scnm').textContent = fetchedScnm;
-            localStorage.setItem('scnm', fetchedScnm); // 로컬 스토리지에 저장
+            localStorage.setItem('scnm', fetchedScnm);
         } else {
             console.warn("학교 이름을 찾을 수 없습니다. 학교 검색을 통해 선택해주세요.");
-            // 학교 검색이 제거되었으므로 이 메시지는 출력되지 않습니다.
         }
     } else if (storedScnm) {
         document.getElementById('scnm').textContent = storedScnm;
     }
-    
-    // 서버에서 시간표 데이터 가져오기
-    //fetch(`http://localhost:3000/api/school/${storage.sc}`)
-    fetch(`https://port-0-comtime-me10tmyt8817a068.sel5.cloudtype.app/api/school/${storage.sc}`)
+
+    // 이후 서버 ip로 수정 (작동 안하면 이거 탓임)
+    fetch(`http://localhost:3000/api/school/${storage.sc}`)
     .then((response) => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -110,8 +87,8 @@ async function api() {
     })
     .then((data) => { 
         console.log("서버에서 받은 시간표 데이터:", data);
-        H시간표 = data; // 전역 H시간표 변수에 데이터 할당
-        화면구성하기(H시간표.오늘r || 1); // 컴시간 JS의 화면 구성 함수 호출
+        H시간표 = data;
+        화면구성하기(H시간표.오늘r || 1);
     })
     .catch(error => console.error('시간표 데이터를 불러오는 중 오류가 발생했습니다:', error));
 }
@@ -127,6 +104,7 @@ function school_change() {
     window.location.href = '/'
 }
 
+// 이 다음은 컴시간 함수들 내가 안함
 
 function 자료944(자료,학년,반) {
     var p,k,th,분리,sb,속성='',
@@ -216,10 +194,7 @@ function 학년시간표출력(자료,학년,요일) {
     }
     var 학급수=요일학급수(학년,요일);
     n=학급수+1-2;
-    /* 자료.학급수[학년]+1-2; */
-    // 요일선택 드롭다운을 학년시간표출력 함수 내에서 직접 생성하여 반환합니다.
-    // 이는 이전에 요일설정하기 함수가 select 요소를 통째로 만들었기 때문입니다.
-    var 요일선택HTML = 요일설정하기(자료, 요일); // 이 함수가 <select id='yo'>를 포함한 HTML을 반환합니다.
+    var 요일선택HTML = 요일설정하기(자료, 요일);
 
     p="<TABLE  style='width:100%; margin:3px 0px;'>";
     p+="<TR><td class='내용2'style='border:0px; text-align:left;'><input type='button' onClick='yo_NextDisp(-1);' value='◀' class='bg-blue-500 text-black hover:bg-blue-600'></td><TD style='border:0px;' colspan='"+n+"' class='내용2'>제 "+학년+" 학년 시간표 "+요일2+"</TD><td class='내용2' style='border:0px; text-align:right;'><input type='button' onClick='yo_NextDisp(1);' value='▶' class='bg-blue-500 text-black hover:bg-blue-600'></td></TR>";
@@ -282,8 +257,6 @@ function 학년시간표출력(자료,학년,요일) {
     }
     p+="</table>";
 
-    // 동적으로 생성된 요일 선택 드롭다운을 시간표 테이블 위에 추가
-    // 이 위치에 추가하는 것이 논리적입니다.
     return 요일선택HTML + p; 
 }
 
@@ -371,7 +344,7 @@ function 요일설정하기(자료,요일2){
         }
         p+="<option value='"+(i+1)+"' "+선택+">"+요일[i]+"</option>";
     }
-    p+="</select>"; // select 태그 닫기 추가
+    p+="</select>";
     return p;
 }
 
@@ -426,8 +399,6 @@ function yo_change(){
     
     const selectedDay = yo_element.value;
     const ba_value = ba_element.value;
-
-    // 학급이 선택되지 않았을 경우 (예: placeholder) 오류를 방지합니다.
     if (!ba_value || ba_value === '') {
         console.error("Error: 유효한 학급이 선택되지 않았습니다.");
         return;
@@ -435,8 +406,6 @@ function yo_change(){
 
     const m2 = ba_value.split('-');
     const 학년 = Number(m2[0]);
-    
-    // 학년 값이 유효한지 확인합니다.
     if (isNaN(학년) || 학년 <= 0) {
         console.error("Error: 유효하지 않은 학년 값입니다.");
         return;
@@ -454,8 +423,6 @@ function yo_NextDisp(방향){
     }
     let k = m.selectedIndex + 방향;
     const maxIndex = m.length - 1;
-
-    // 인덱스 0은 '요일' placeholder 이므로 무시하고 1부터 시작합니다.
     if(k < 1) {
         k = maxIndex;
     } else if(k > maxIndex) {
@@ -499,14 +466,13 @@ function 요일출력하기(시작일){
 }
 
 function ba_change(){
-    const m = document.getElementById('ba'); // 요소를 직접 가져옵니다.
+    const m = document.getElementById('ba');
     if (!m) {
         console.error("Error: 'ba' element not found for ba_change.");
         return;
     }
     const ba_value = m.value;
 
-    // 학급이 선택되지 않았을 경우 오류를 방지합니다.
     if (!ba_value || ba_value === '') {
         console.error("Error: 유효한 학급이 선택되지 않았습니다.");
         $('#hour').empty();
@@ -518,7 +484,6 @@ function ba_change(){
     const 학년 = Number(m2[0]);
     const 반 = Number(m2[1]);
     
-    // 학년 값이 유효한지 확인합니다.
     if (isNaN(학년) || 학년 <= 0) {
         console.error("Error: 유효하지 않은 학년 값입니다.");
         return;
@@ -534,22 +499,20 @@ function 학년출력하기(학년){
     localStorage.setItem('ba', storage.ba);
     let 요일;
     const d = new Date();
-    요일 = d.getDay(); // 현재 요일 가져오기 (0:일, 1:월, ..., 6:토)
-    if(요일 == 0) 요일 = 1; // 일요일이면 월요일로
-    if(요일 == 6) 요일 = 5; // 토요일이면 금요일로 (주중만 표시)
+    요일 = d.getDay();
+    if(요일 == 0) 요일 = 1;
+    if(요일 == 6) 요일 = 5;
 
     if(Array.isArray(H시간표.전체학년) == false) {
         H시간표.전체학년 = [1,1,1,1];
     }
 
     if(H시간표.전체학년[학년] == 1) {
-        // 학년시간표출력 함수가 요일 선택 select 박스 (id="yo")를 포함한 HTML을 반환
         $('#hour2').empty().append(학년시간표출력(H시간표, 학년, 요일));
 
-        // 학년시간표출력 후 'yo' 요소가 DOM에 추가되었으므로, 이제 값을 설정할 수 있습니다.
         const elem = document.getElementById('yo');
-        if (elem) { // 요소가 존재하는지 다시 확인
-            elem.value = 요일; // 초기 요일 값 설정
+        if (elem) {
+            elem.value = 요일;
         }
     } else {
         $('#hour2').empty();
@@ -565,7 +528,6 @@ function ba_NextDisp(방향){
     let k = m.selectedIndex + 방향;
     const maxIndex = m.length - 1;
     
-    // 인덱스 0은 placeholder 이므로 1부터 시작합니다.
     if(k < 1) {
         k = maxIndex;
     } else if(k > maxIndex) {
@@ -599,7 +561,6 @@ function 화면구성하기(r) {
         if(반>H시간표.학급수[학년]) 반=1;
     }
     var ma=document.getElementById('ba');
-    // ma가 null일 경우를 대비한 방어 코드 추가
     if (ma) {
         ma.value=(학년+'-'+반);
     } else {
@@ -608,7 +569,6 @@ function 화면구성하기(r) {
     $('#hour').empty().append(자료944(H시간표,학년,반));
     $('#수정일').text('수정일: '+H시간표.자료244);
     학년출력하기(학년);
-    /*H시간표.컴시간='<p>안드로이드폰은 [구글Play스토어]에서 컴시간알리미앱을 설치하세요.<p>아이폰은 [앱스토어]에서 컴시간알리미앱을 설치하세요.';*/
     컴시간_메세지출력();
     학교_메세지출력();
 }
